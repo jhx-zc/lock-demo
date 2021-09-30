@@ -1,13 +1,16 @@
 package demo2
 
-import "sync"
+import (
+	"go.uber.org/atomic"
+	"sync"
+)
 
 type Locker struct {
 	l1 sync.Mutex
 	//真实的锁
 	l2 sync.Mutex
 
-	locked bool
+	locked *atomic.Bool
 }
 
 //
@@ -15,13 +18,17 @@ type Locker struct {
 //  @return bool true:got lock success  false:got lock failed
 //
 func (m *Locker) tryLock() bool {
-	m.l1.Lock()
-	defer m.l1.Unlock()
-	if m.locked {
+	if m.locked.Load() {
 		return false
 	}
 
-	m.locked = true
+	m.l1.Lock()
+	defer m.l1.Unlock()
+	if m.locked.Load() {
+		return false
+	}
+
+	m.locked.Store(true)
 	m.l2.Lock()
 	return true
 }
@@ -29,6 +36,6 @@ func (m *Locker) tryLock() bool {
 func (m *Locker) releaseLock() {
 	m.l2.Unlock()
 	m.l1.Lock()
-	m.locked = false
+	m.locked.Store(false)
 	m.l1.Unlock()
 }

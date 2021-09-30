@@ -6,7 +6,7 @@ import (
 	"sync"
 )
 
-var l = &Locker{}
+var l = &Locker{locked: atomic.NewBool(false)}
 
 func tryDoJob5(isJob5Done *atomic.Bool, threadId int) {
 	//fmt.Println(threadId, " tryDoJob5")
@@ -14,8 +14,7 @@ func tryDoJob5(isJob5Done *atomic.Bool, threadId int) {
 		if l.tryLock() {
 			jobs.Job5(threadId)
 			isJob5Done.Store(true)
-			l.locked = false
-			l.l2.Unlock()
+			l.releaseLock()
 		}
 	}
 }
@@ -39,5 +38,7 @@ func DoWork(wg *sync.WaitGroup, threadId int) {
 		jobs.Job5(threadId)
 		l.l2.Unlock()
 	}
-	wg.Done()
+	if wg != nil {
+		wg.Done()
+	}
 }
