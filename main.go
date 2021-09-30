@@ -4,23 +4,22 @@ import (
 	"fmt"
 	"lock_demo/demo1"
 	"lock_demo/demo2"
-	"runtime"
 	"sync"
 	"time"
 )
 
 const (
-	threadCount = 2
+	threadCount = 20
 )
 
 func testDemo() {
 	startTime := time.Now()
 
 	for i := 0; i < threadCount; i++ {
-		demo2.DoWork(nil, i)
+		demo1.DoWork(nil, i)
 	}
 
-	fmt.Println("demo2 spend time(Milliseconds):", time.Since(startTime).Milliseconds())
+	fmt.Println("demo1 spend time(Milliseconds):", time.Since(startTime).Milliseconds())
 }
 
 func testDemo1() {
@@ -54,8 +53,6 @@ func testDemo2() {
 }
 
 func main() {
-	runtime.GOMAXPROCS(4)
-
 	testDemo()
 
 	fmt.Println("-----------")

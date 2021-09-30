@@ -8,13 +8,27 @@ import (
 var l = &Locker{}
 
 func DoWork(wg *sync.WaitGroup, threadId int) {
+	l.doLock()
 	jobs.Job1(threadId)
-	jobs.Job2(threadId)
-	jobs.Job3(threadId)
-	jobs.Job4(threadId)
+	l.doUnLock()
 
 	l.doLock()
-	jobs.Job5(threadId)
+	jobs.Job2(threadId)
 	l.doUnLock()
-	wg.Done()
+
+	//l.doLock()
+	jobs.Job3(threadId)
+	//l.doUnLock()
+
+	//l.doLock()
+	jobs.Job4(threadId)
+	//l.doUnLock()
+
+	//l.doLock()
+	jobs.Job5(threadId)
+	//l.doUnLock()
+
+	if wg != nil {
+		wg.Done()
+	}
 }

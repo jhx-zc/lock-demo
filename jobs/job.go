@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"runtime"
 	"time"
 )
 
@@ -43,6 +44,7 @@ func copyFile1(srcFile, destFile string) error {
 func job(times int) int {
 	arr := make([]byte, times)
 	count := 1
+	runtime.LockOSThread()
 	for k := 0; k < 4000; k++ {
 		for i := 0; i < times/2; i++ {
 			for j := 0; j < i; j++ {
@@ -51,12 +53,13 @@ func job(times int) int {
 			}
 		}
 	}
-	_ = copyFile1("/tmp/demo.txt", "/tmp/demo_out.txt")
+	runtime.UnlockOSThread()
+	//_ = copyFile1("/tmp/demo.txt", "/tmp/demo_out.txt")
 
 	return count
 }
 
-const spendTime = 2000
+const spendTime = 800
 
 func Job1(threadId int) {
 	startTime := time.Now()
